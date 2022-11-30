@@ -2,8 +2,10 @@ package com.example.exercise_10;
 
 import androidx.appcompat.app.AppCompatActivity;
 
+import android.app.AlertDialog;
 import android.os.Bundle;
 import android.view.View;
+import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.EditText;
@@ -18,7 +20,7 @@ public class MainActivity extends AppCompatActivity {
     private ListView numberListView;
 
     private ArrayList<String > numberList = new ArrayList<>();
-
+    private ArrayAdapter<String> adapter;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -27,9 +29,15 @@ public class MainActivity extends AppCompatActivity {
         addBtn = findViewById(R.id.addBtn);
         numberListView = findViewById(R.id.numberLV);
 
-        ArrayAdapter<String> adapter = new ArrayAdapter<>(this, android.R.layout.simple_list_item_1,numberList);
+        adapter = new ArrayAdapter<>(this, android.R.layout.simple_list_item_1,numberList);
         numberListView.setAdapter(adapter);
-
+        numberListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+                String selectedItem = (String) parent.getItemAtPosition(position);
+                displayAlert(selectedItem,position);
+            }
+        });
         addBtn.setOnClickListener(new View.OnClickListener() {
             public void onClick(View v) {
                 try{
@@ -44,5 +52,20 @@ public class MainActivity extends AppCompatActivity {
                 }
             }
         });
+    }
+
+    private void displayAlert(String number,int position){
+        new AlertDialog.Builder(this)
+
+                .setPositiveButton("Yes", (dialog, which) -> deleteRaw(position))
+                .setTitle("Do you want to delete number " + number + "?")
+                .setNegativeButton("No", null)
+                .create()
+                .show();
+    }
+
+    private void deleteRaw(int position){
+        numberList.remove(position);
+        adapter.notifyDataSetChanged();
     }
 }
